@@ -1,0 +1,133 @@
+STUDENT NAME MAPPING ANALYSIS
+==================================================
+
+F2 names: 29
+F5 names: 37
+F6 names: 40
+Grades names: 104
+Total name list students: 106
+
+MATCHES FOUND:
+--------------------
+
+F2 (28 matches):
+  Nicholas Camargo -> Camargo, Nicholas
+  Nicholas Choi -> Choi, Nicholas
+  Benjamin Coca -> Coca, Benjamin
+  Aiden Collins -> Collins, Aiden
+  Athena Conti -> Conti, Athena
+  Nya Davis -> Davis, Nya
+  Sofia Destreza -> Destreza, Sofia
+  Gabriel Drozd -> Drozd, Gabriel
+  Phoenix Enolpe -> Enolpe, Phoenix
+  Alexandria Gerold -> Gerold, Alexandria
+  Olga Gevko -> Gevko, Olga
+  Olivia Knaps -> Knaps, Olivia
+  Adriana LaGrega -> Lagrega, Adriana
+  Michael Moore -> Moore, Michael
+  Nancy Muniz -> Muniz, Nancy
+  Ella Naab -> Naab, Ella
+  Nalesha Nandnarine -> Nandnarine, Nalesha
+  Sarina Prabhudyal -> Prabhudyal, Sarina
+  Aliana Quinonez -> Quinonez, Aliana
+  Franklyn Rodriguez -> Rodriguez, Franklyn
+  Lorealy Schaper -> Schaper, Lorealy
+  Rani Sunder -> Sunder, Rani
+  Aubrienne Toro -> Toro, Aubrienne
+  Creed Upton -> Upton, Creed
+  Kayden Valerio -> Valerio, Kayden
+  Brielle Whitney -> Whitney, Brielle
+  Evangeline Young -> Young, Evangeline
+  Julia Zavalunov -> Zavalunov, Julia
+
+F5 (36 matches):
+  Jadon Anglade -> Anglade, Jadon
+  Joseph Carbone Jr -> Carbone Jr, Joseph
+  Michael Cataldo -> Cataldo, Michael
+  Anna Maria Delegos -> Delegos, Anna Maria
+  Jaycob Dutan -> Dutan, Jaycob
+  Maleyah Eckstein -> Eckstein, Maleyah
+  Giuliana Falcone -> Falcone, Giuliana
+  Ava Fescina -> Fescina, Ava
+  Thomas Ford -> Ford, Thomas
+  Neil Gillings -> Gillings, Neil
+  Michael Girdusky -> Girdusky, Michael
+  Patrick Harvey -> Harvey, Patrick
+  Elvis Hoxha -> Hoxha, Elvis
+  Madison Lamberty-Dalto -> Lamberty-Dalto, Madison
+  Marco Landeta III -> Landeta Iii, Marco
+  Ethen Latchman -> Latchman, Ethen
+  Adriana Laurenzano -> Laurenzano, Adriana
+  Dariel Lelia -> Lelia, Dariel
+  Riley Sky Mantaring -> Mantaring, Riley
+  William McKinzie -> Mckinzie, William
+  Emilia Miazga -> Miazga, Emilia
+  Thomas Molfetta -> Molfetta, Thomas
+  Riley Morgan -> Morgan, Riley
+  Dimitri Papavlasopoulos -> Papavlasopoulos, Dimitri
+  Liam Rafailov -> Rafailov, Liam
+  Julianna Ramirez -> Ramirez, Julianna
+  Jonathan Rodriguez -> Rodriguez, Jonathan
+  Natalia Romero -> Romero, Natalia
+  Emma Rosen -> Rosen, Emma
+  Meya Sookram -> Sookram, Meya
+  Alyssa Tupsaitong -> Tupsaitong, Alyssa
+  Leah Vasquez -> Vasquez, Leah
+  Gabriella Vincenti -> Vincenti, Gabriella
+  Ryan Weeks -> Weeks, Ryan
+  Jack Welz -> Welz, Jack
+  Bryan Zeng -> Zeng, Bryan
+
+F6 (39 matches):
+  Kenechukwu Ajulu -> Ajulu, Kenechukwu
+  Sophia Allocco -> Allocco, Sophia
+  Evan Bello -> Bello, Evan
+  Kacper Bzura -> Bzura, Kacper
+  Marvelle Celaj -> Celaj, Marvelle
+  Chloe Cheung -> Cheung, Chloe
+  Matthew Chiofolo -> Chiofolo, Matthew
+  Bryan Cobles -> Cobles, Bryan
+  Christian Contreras -> Contreras, Christian
+  Dean Cruz -> Cruz, Dean
+  Maximilian Cruz -> Cruz, Maximilian
+  Anthony Deliote -> Deliote, Anthony
+  Victoria Deng -> Deng, Victoria
+  Robert DiMino -> Dimino, Robert
+  Natalie Drozd -> Drozd, Natalie
+  Lucas Encalada -> Encalada, Lucas
+  Michael Gryzlak -> Gryzlak, Michael
+  Rihanna Hoxhaj -> Hoxhaj, Rihanna
+  Nicole Jankowski -> Jankowski, Nicole
+  Maeve Kyne-Purcell -> Kyne-Purcell, Maeve
+  Prelie Lin -> Lin, Prelie
+  Kieran Long -> Long, Kieran
+  Emma Lopez -> Lopez, Emma
+  Cassandra McCarthy -> McCarthy, Cassandra
+  Thomas McNamara -> Mcnamara, Thomas
+  Susanna Miller-Wiltshire -> Miller-Wiltshire, Susanna
+  Rediet Negussie -> Negussie, Rediet
+  Matthew Nogales -> Nogales, Matthew
+  Genevieve Olin -> Olin, Genevieve
+  Lucas Pincay -> Pincay, Lucas
+  Erika Salari -> Salari, Erika
+  Kayleb Schmitt -> Schmitt, Kayleb
+  Christian Scott -> Scott, Christian
+  Alexander Shaurov -> Shaurov, Alexander
+  Aubrey Sullivan -> Sullivan, Aubrey
+  Finn Trears -> Trears, Finn
+  Zlatan Valdez -> Valdez, Zlatan
+  Ravi Wilson -> Wilson, Ravi
+  Bella Zambrano -> Zambrano, Bella
+
+UNMATCHED NAMES IN LISTS:
+------------------------------
+
+UNMATCHED GRADES (0 total):
+------------------------------
+
+SUMMARY:
+----------
+Total matches found: 103
+Total unmatched from lists: 0
+Total unmatched from grades: 0
+Note: Harry Champagnat (test user) excluded from analysis

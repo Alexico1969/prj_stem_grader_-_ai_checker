@@ -1,0 +1,13 @@
+F2 - names.csv
+F5 - names.csv
+F6 - names.csv
+S1 - names.csv
+S5 - names.csv
+PrjStem_login.txt
+token.pickle
+credentials.json
+active_classes.json
+__pycache__/
+*.pyc
+.claude/settings.local.json
+ai_check_*.pdf
