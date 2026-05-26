@@ -5,7 +5,7 @@ For every student in checklist_S1_S5.csv, fetch their code submission for
 every URL in assignments_to_check.txt, scan for AI-cheating indicators,
 and write the findings to a timestamped PDF report.
 
-Requires:  pip install selenium reportlab
+Requires:  pip install selenium reportlab 
 """
 
 import csv
