@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ai_check.py
-For every student in checklist_S1_S5.csv, fetch their code submission for
+For every student in names.csv, fetch their code submission for
 every URL in assignments_to_check.txt, scan for AI-cheating indicators,
 and write the findings to a timestamped PDF report.
 
@@ -38,10 +38,10 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 LOGIN_URL        = "https://projectstem.org/users/sign_in"
 BASE_URL         = "https://courses.projectstem.org"
-CSV_FILE         = "checklist_S1_S5.csv"
+CSV_FILE         = "names.csv"
 ASSIGNMENTS_FILE = "assignments_to_check.txt"
 CREDS_FILE       = "PrjStem_login.txt"
-GRADES_FILE      = "Grades_explorted.csv.csv"
+GRADES_FILE      = "grades.csv"
 
 # ---------------------------------------------------------------------------
 # AI-cheating patterns

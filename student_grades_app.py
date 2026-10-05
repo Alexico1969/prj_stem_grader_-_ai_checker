@@ -52,6 +52,8 @@ class StudentGradesApp:
             'btn_cfg_hov':  '#2563eb',
             'btn_exp':      '#059669',
             'btn_exp_hov':  '#047857',
+            'btn_ai':       '#dc2626',
+            'btn_ai_hov':   '#b91c1c',
             'main_bg':      '#f8fafc',
             'card_bg':      '#ffffff',
             'card_border':  '#e2e8f0',
@@ -139,6 +141,12 @@ class StudentGradesApp:
         sidebar_btn("Export Sub-chapter → Google Sheets",
                     self.export_subchapter_to_sheets,  C['btn_exp'], C['btn_exp_hov'])
 
+        tk.Frame(sidebar, bg=C['divider'], height=1).pack(fill=tk.X, padx=12, pady=(12, 0))
+
+        section_label("AI CHECK")
+        sidebar_btn("AI Check",
+                    self.show_ai_check,                C['btn_ai'], C['btn_ai_hov'])
+
         # ── Main content area ─────────────────────────────────────────
         main = tk.Frame(self.root, bg=C['main_bg'])
         main.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -162,7 +170,21 @@ class StudentGradesApp:
             insertbackground=C['text_main']
         )
         self.results_text.pack(fill=tk.BOTH, expand=True, padx=1, pady=1)
-    
+
+        # Action bar below the output card — only shown on the AI Check screen
+        self.ai_bar = tk.Frame(main, bg=C['main_bg'])
+        start_btn = tk.Button(
+            self.ai_bar, text="Start AI Check", command=self.start_ai_check,
+            bg=C['btn_ai'], fg='#ffffff',
+            activebackground=C['btn_ai_hov'], activeforeground='#ffffff',
+            font=('Segoe UI', 11, 'bold'), relief=tk.FLAT, bd=0,
+            padx=26, pady=10, cursor='hand2'
+        )
+        start_btn.pack(side=tk.RIGHT)
+        start_btn.bind('<Enter>', lambda e: start_btn.config(bg=C['btn_ai_hov']))
+        start_btn.bind('<Leave>', lambda e: start_btn.config(bg=C['btn_ai']))
+        self.ai_bar_anchor = card_outer
+
     def load_data(self):
         """Load data from CSV files"""
         try:
@@ -269,8 +291,18 @@ class StudentGradesApp:
                 with open(filepath, 'r', encoding='utf-8') as file:
                     reader = csv.reader(file)
                     for row in reader:
-                        if row and row[0].strip() and row[0].lower() != 'name':
-                            self.student_names[section].append(row[0].strip())
+                        cells = [c.strip() for c in row]
+                        # Unquoted "Last, First" splits into two name-like cells; rejoin them
+                        if (len(cells) == 2 and cells[1]
+                                and all(re.fullmatch(r"[^\W\d_][\w .'-]*", c) for c in cells)):
+                            cells = [f"{cells[0]}, {cells[1]}"]
+                        if cells and cells[0] and cells[0].lower() != 'name':
+                            name = cells[0]
+                            # Store "Last, First" as "First Last" to match how grades are compared
+                            if name.count(',') == 1:
+                                last, first = (p.strip() for p in name.split(','))
+                                name = f"{first} {last}"
+                            self.student_names[section].append(name)
             except FileNotFoundError:
                 print(f"Warning: {filepath} not found")
             except Exception as e:
@@ -740,6 +772,7 @@ class StudentGradesApp:
     
     def show_progress(self, text):
         """Clear the results area and show a progress message immediately."""
+        self.ai_bar.pack_forget()
         self.results_text.config(state=tk.NORMAL)
         self.results_text.delete(1.0, tk.END)
         self.results_text.insert(tk.END, text)
@@ -751,6 +784,7 @@ class StudentGradesApp:
         import webbrowser
 
         # Clear existing content
+        self.ai_bar.pack_forget()
         self.results_text.config(state=tk.NORMAL)
         self.results_text.delete(1.0, tk.END)
 
@@ -785,6 +819,179 @@ class StudentGradesApp:
 
         # Ensure the widget is editable only programmatically
         self.results_text.config(state=tk.DISABLED)
+
+    # ── AI Check ──────────────────────────────────────────────────────
+
+    AI_ROSTER_FILE      = 'names.csv'
+    AI_ASSIGNMENTS_FILE = 'assignments_to_check.txt'
+    AI_LOGIN_FILE       = 'PrjStem_login.txt'
+    AI_SCRIPT           = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ai_check.py')
+
+    def ai_check_requirements(self):
+        """Return (lines describing each requirement's state, list of blocking problems)."""
+        import importlib.util
+        from datetime import datetime
+
+        lines, problems = [], []
+
+        def ok(text):   lines.append(f"    [OK]      {text}")
+        def warn(text): lines.append(f"    [NOTE]    {text}")
+        def bad(text):
+            lines.append(f"    [MISSING] {text}")
+            problems.append(text)
+
+        # 1. Grades export
+        if os.path.exists('grades.csv'):
+            mtime = datetime.fromtimestamp(os.path.getmtime('grades.csv'))
+            ok(f"grades.csv found (exported {mtime:%Y-%m-%d %H:%M})")
+        else:
+            warn("grades.csv not found — the 'grade exists but no code found' cross-check will be skipped")
+        lines.append("")
+
+        # 2. Roster
+        roster = []
+        try:
+            with open(self.AI_ROSTER_FILE, newline='', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                needed = {'First name', 'Last name', 'ID'}
+                missing_cols = needed - set(reader.fieldnames or [])
+                if missing_cols:
+                    bad(f"{self.AI_ROSTER_FILE} is missing column(s): {', '.join(sorted(missing_cols))}")
+                else:
+                    roster = [r for r in reader if (r.get('ID') or '').strip()]
+                    groups = sorted({(r.get('Group') or '').strip() for r in roster} - {''})
+                    group_str = f" (groups: {', '.join(groups)})" if groups else ""
+                    ok(f"{self.AI_ROSTER_FILE}: {len(roster)} students{group_str}")
+        except FileNotFoundError:
+            bad(f"{self.AI_ROSTER_FILE} not found")
+        lines.append("")
+
+        # 3. Assignments to check
+        try:
+            with open(self.AI_ASSIGNMENTS_FILE, encoding='utf-8') as f:
+                urls = [l.strip() for l in f if l.strip().startswith('http')]
+        except FileNotFoundError:
+            urls = None
+        if urls is None:
+            bad(f"{self.AI_ASSIGNMENTS_FILE} not found")
+        elif not urls:
+            bad(f"{self.AI_ASSIGNMENTS_FILE} has no assignment URLs")
+        else:
+            ok(f"{self.AI_ASSIGNMENTS_FILE}: {len(urls)} assignment(s)")
+            ids_to_names = {}
+            for a in self.assignments:
+                m = re.search(r'\((\d+)\)\s*$', a)
+                if m:
+                    ids_to_names[m.group(1)] = a
+            for url in urls:
+                m = re.search(r'/(?:assignments|quizzes)/(\d+)', url)
+                name = ids_to_names.get(m.group(1)) if m else None
+                lines.append(f"                - {name or url}")
+        lines.append("")
+
+        # 4. Login
+        if os.path.exists(self.AI_LOGIN_FILE):
+            ok(f"{self.AI_LOGIN_FILE} found")
+        else:
+            warn(f"{self.AI_LOGIN_FILE} not found — you will be asked to log in in the console window")
+        lines.append("")
+
+        # 5. Software
+        missing_pkgs = [p for p in ('selenium', 'reportlab') if importlib.util.find_spec(p) is None]
+        if missing_pkgs:
+            bad(f"Python package(s) not installed: {', '.join(missing_pkgs)}  "
+                f"(run: pipenv install  or  pip install {' '.join(missing_pkgs)})")
+        else:
+            ok("Python packages selenium and reportlab installed")
+        if not os.path.exists(self.AI_SCRIPT):
+            bad(f"ai_check.py not found next to the app")
+
+        return lines, problems
+
+    def show_ai_check(self):
+        """Show the AI Check explainer with a live checklist and the Start button."""
+        status_lines, problems = self.ai_check_requirements()
+
+        text = (
+            "AI CHECK\n"
+            "========\n\n"
+            "Opens every student's code submission on ProjectStem for the assignments you\n"
+            "choose, scans it for code the class has not learned yet, and writes the\n"
+            "findings to a PDF report.\n\n"
+            "STEPS\n"
+            "-----\n\n"
+            "1. Export current grades\n"
+            "   ProjectStem > Grades > Export, saved as grades.csv in the app folder.\n"
+            "   Used to warn when a student has a grade but their code could not be read.\n\n"
+            f"2. Student list: {self.AI_ROSTER_FILE}\n"
+            "   Columns: First name, Last name, ID, Group\n"
+            "   ID must be the ProjectStem student ID (the ID column in grades.csv).\n\n"
+            f"3. Assignments: {self.AI_ASSIGNMENTS_FILE}\n"
+            "   One ProjectStem assignment or quiz URL per line. Copy the URL from the\n"
+            "   browser while the assignment is open.\n\n"
+            f"4. Login: {self.AI_LOGIN_FILE} (optional)\n"
+            "   Two lines:   username: your@email.com\n"
+            "                password: yourpassword\n"
+            "   Without it, the console window asks for your login.\n\n"
+            "5. Click 'Start AI Check' below\n"
+            "   A console window shows progress and a Chrome window opens. Don't use that\n"
+            "   Chrome window while it runs. Each student and assignment takes several\n"
+            "   seconds, so a full class can take a while.\n\n"
+            "6. Read the report\n"
+            "   When finished, ai_check_YYYYMMDD_HHMMSS.pdf is saved in the app folder.\n\n"
+            "WHAT GETS FLAGGED\n"
+            "-----------------\n\n"
+            "   comment     any line containing #\n"
+            "   f-string    f\"...\" or f'...'\n"
+            "   for loop    a line starting with for\n"
+            "   while loop  a line starting with while\n\n"
+            "   A flag means 'look at this', not proof of AI use. Update the CHECKS list\n"
+            "   in ai_check.py as the class learns new topics.\n\n"
+            "CURRENT STATUS\n"
+            "--------------\n\n"
+            + "\n".join(status_lines) + "\n"
+        )
+        if problems:
+            text += "\nFix the [MISSING] items above before starting.\n"
+        else:
+            text += "\nReady to start.\n"
+
+        self.display_result(text)
+        self.ai_bar.pack(side=tk.BOTTOM, fill=tk.X, padx=18, pady=(0, 18),
+                         before=self.ai_bar_anchor)
+
+    def start_ai_check(self):
+        """Run ai_check.py in its own console window."""
+        import subprocess
+        import sys
+
+        _, problems = self.ai_check_requirements()
+        if problems:
+            messagebox.showerror("AI Check", "Can't start yet:\n\n- " + "\n- ".join(problems))
+            self.show_ai_check()
+            return
+
+        if not messagebox.askyesno(
+                "Start AI Check",
+                "This opens a console window and a Chrome window, then checks every "
+                "student. It can take a while.\n\nStart now?"):
+            return
+
+        try:
+            if sys.platform == 'win32':
+                # cmd /k keeps the console open afterwards so the summary can be read
+                # (outer quotes are stripped by cmd, so paths with spaces survive)
+                subprocess.Popen(
+                    f'cmd /k ""{sys.executable}" "{self.AI_SCRIPT}""',
+                    cwd=os.getcwd(), creationflags=subprocess.CREATE_NEW_CONSOLE
+                )
+            else:
+                subprocess.Popen([sys.executable, self.AI_SCRIPT], cwd=os.getcwd())
+        except Exception as e:
+            messagebox.showerror("AI Check", f"Could not start ai_check.py:\n{e}")
+            return
+
+        self.status_var.set("AI Check running in a separate window — the PDF report will be saved in the app folder")
 
 
 # ── Shared dialog palette & button helper ────────────────────────────────────

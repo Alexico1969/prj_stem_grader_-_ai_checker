@@ -1,13 +1,24 @@
-F2 - names.csv
-F5 - names.csv
-F6 - names.csv
-S1 - names.csv
-S5 - names.csv
+# Student data — never commit
+* - names.csv
+* - names.txt
+names.csv
+grades.csv
+*Grades*.csv
+checklist*.csv
+student_mapping_results.txt
+ai_check_*.pdf
+
+# Credentials
 PrjStem_login.txt
 token.pickle
 credentials.json
+
+# Local state
 active_classes.json
+.claude/settings.local.json
+
+# Python
 __pycache__/
 *.pyc
-.claude/settings.local.json
-ai_check_*.pdf
+.venv/
+venv/
